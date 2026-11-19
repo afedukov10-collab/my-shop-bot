@@ -9,7 +9,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from fragment_api.client import FragmentAPIClient
+from FragmentAPI import FragmentClient
 
 # ========== НАСТРОЙКИ ==========
 BOT_TOKEN = "9222158924:AAHnZPNU6pRXhwnsmcQvVX2KTzXkkEbYfAk"
@@ -19,7 +19,7 @@ MY_TON_WALLET = "UQDdgrCiFuUt0b1afacGhEiKQCTIhwONx1hTFJVKZbwDetwc"
 BY_CARD_NUMBER = "9112 3801 9121 1830"
 
 # ========== ДАННЫЕ ДЛЯ FRAGMENT ==========
-FRAGMENT_SEED = "bWlsayB3aWxkIGFjY2lkZW50IGV4cGxhaW4gc3F1YXJlIGhlaWdodCByZW1lbWJlciBjb2FzdCBqb3kgc2tpcnQgdHViZSB0YXR0b28gbWVyaXQgZG92ZSBoYXZlIGdyaWVmIGVsZXZhdG9yIHBvbnkgY2FzaCBhbGxleSBhY2Nlc3Mgc3Vycm91bmQgdml0YWwgYWdyZWU="
+FRAGMENT_SEED = "milk wild accident explain square height remember coast joy skirt tube tattoo merit dove have grief elevator pony cash alley access surround vital agree"
 FRAGMENT_COOKIES = '{"stel_token":"9f33e63ca3c60bc8f5ccc97e33767d329f33e6269f33eab616c15fb49301c752e3f99","stel_ssid":"0377ac196801f09708_3134387726996450323","stel_ton_token":"59-o_9wFaMiDGnA2f7xORumamdCHSv4gNwb5TwpUWzdHEuXco8Y0rFQGPDFI_U7hjbAzUV552RkaVvMU2vtsmBR8VzyYXMCTN8Uqu6RRdkxGyXCdykhLO3BhTBnXV9rC5jg3qJAEPK2pGpUGxM3omMzc2b6m6sZASEq5RNKlPPBYpArVeoMicKmiGhpYtNj6XaH9jiUR","stel_dt":"-180"}'
 # ======================================
 
@@ -59,23 +59,19 @@ async def clean_chat(chat_id, message_id=None):
         pass
 
 # --- ФУНКЦИЯ ПОКУПКИ STARS ---
+from FragmentAPI import FragmentClient
+
 async def buy_stars_fragment(username: str, amount: int):
-    if not FRAGMENT_SEED or FRAGMENT_SEED == "bWlsayB3aWxkIGFjY2lkZW50IGV4cGxhaW4gc3F1YXJlIGhlaWdodCByZW1lbWJlciBjb2FzdCBqb3kgc2tpcnQgdHViZSB0YXR0b28gbWVyaXQgZG92ZSBoYXZlIGdyaWVmIGVsZXZhdG9yIHBvbnkgY2FzaCBhbGxleSBhY2Nlc3Mgc3Vycm91bmQgdml0YWwgYWdyZWU=":
+    if not FRAGMENT_SEED:
         raise Exception("Не задан FRAGMENT_SEED")
-        
-    def _buy():
-        with FragmentAPIClient() as client:
-            result = client.buy_stars(
-                username=username, amount=amount, seed=FRAGMENT_SEED,
-                cookies=FRAGMENT_COOKIES, payment_method="ton", wait=True
-            )
-            return result
     
-    result = await asyncio.to_thread(_buy)
-    if result.success:
-        return True
-    else:
-        raise Exception(f"Fragment Error: {result.error}")
+    async with FragmentClient(seed=FRAGMENT_SEED) as client:
+        result = await client.purchase_stars(
+            username=username,
+            amount=amount
+        )
+        # Дальше твоя логика с result, возможно, поле отличается
+        return result
 
 # --- СОЗДАНИЕ СЧЕТА XROCKET ---
 async def create_xrocket_invoice(amount: float, currency: str, description: str):
