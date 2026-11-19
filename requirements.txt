@@ -1,4 +1,4 @@
 aiogram
 flask
-fragment-api-lib
+fragment-api-py
 aiohttp
